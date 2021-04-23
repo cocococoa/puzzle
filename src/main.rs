@@ -139,6 +139,7 @@ fn pretty_print_latin(latin: &Latin) {
 fn dfs(
     transversal_map: &Vec<Vec<Transversal>>,
     state: &mut Vec<Transversal>,
+    board: &mut [[u8; 16]; 16],
     size: u8,
     search: u8,
     answers: &mut Vec<Vec<Transversal>>,
@@ -147,32 +148,31 @@ fn dfs(
 
     let transversals = &transversal_map[search as usize];
 
-    let mut sum = [[0u8; 16]; 16];
-    for t in state.iter() {
-        for j in 0..size {
-            // some transversal uses (t.get(j), j)
-            sum[j as usize][t.get(j) as usize] = 1;
-        }
-    }
-    let sum = sum;
-
     for t in transversals.iter() {
         // state に t を追加して矛盾が生じないかチェックする
         let mut ok = true;
         for j in 0..size {
-            if sum[j as usize][t.get(j) as usize] == 1 {
+            if board[j as usize][t.get(j) as usize] == 1 {
                 ok = false;
                 break;
             }
         }
         if ok {
             state.push(*t);
+            for j in 0..size {
+                board[j as usize][t.get(j) as usize] = 1;
+            }
+
             if search + 1 == size {
                 answers.push(state.clone());
             } else {
-                dfs(transversal_map, state, size, search + 1, answers);
+                dfs(transversal_map, state, board, size, search + 1, answers);
             }
+
             state.pop();
+            for j in 0..size {
+                board[j as usize][t.get(j) as usize] = 0;
+            }
         }
     }
 }
@@ -192,10 +192,11 @@ fn search_orthogonal_latin(latin: &Latin, verbose: bool) -> Vec<Latin> {
     }
 
     let mut state = vec![];
+    let mut board = [[0u8; 16]; 16];
     let mut answers = vec![];
     state.reserve(100);
     answers.reserve(100);
-    dfs(&transversal_map, &mut state, latin.size(), 0, &mut answers);
+    dfs(&transversal_map, &mut state, &mut board, latin.size(), 0, &mut answers);
 
     let mut ret = vec![];
     for answer in answers.into_iter() {
