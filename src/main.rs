@@ -1,6 +1,7 @@
 use itertools::Itertools;
 use std::collections::HashMap;
 use std::io::{self, BufRead};
+use std::time::Instant;
 
 // 16x16までしか対応しない
 // 実行時間的に10x10が限界か？
@@ -180,6 +181,7 @@ fn dfs(
     }
 }
 fn search_orthogonal_latin(latin: &Latin, verbose: bool) -> Vec<Latin> {
+    let start = Instant::now();
     let transversal_map = get_transversals(latin);
 
     if verbose {
@@ -205,6 +207,15 @@ fn search_orthogonal_latin(latin: &Latin, verbose: bool) -> Vec<Latin> {
             }
         }
         ret.push(x);
+    }
+
+    let end = start.elapsed();
+    if verbose {
+        println!(
+            "Search time: \n\t{}.{:03} [sec]",
+            end.as_secs(),
+            end.subsec_nanos() / 1_000_000
+        );
     }
 
     ret
