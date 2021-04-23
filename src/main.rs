@@ -148,11 +148,11 @@ fn dfs(
     search: u8,
     answers: &mut Vec<Vec<Transversal>>,
 ) {
-    assert_eq!(state.len(), search as usize);
+    debug_assert_eq!(state.len(), search as usize);
 
     let transversals = transversal_map.get(&search).unwrap();
 
-    let mut sum = vec![vec![0; size as usize]; size as usize];
+    let mut sum = [[0u8; 16]; 16];
     for t in state.iter() {
         for j in 0..size {
             // some transversal uses (t.get(j), j)
