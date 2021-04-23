@@ -1,5 +1,4 @@
 use itertools::Itertools;
-use std::collections::HashMap;
 use std::io::{self, BufRead};
 use std::time::Instant;
 
@@ -89,8 +88,8 @@ impl Transversal {
     }
 }
 
-fn get_transversals(latin: &Latin) -> HashMap<u8, Vec<Transversal>> {
-    let mut ret: HashMap<u8, Vec<Transversal>> = HashMap::new();
+fn get_transversals(latin: &Latin) -> Vec<Vec<Transversal>> {
+    let mut ret: Vec<Vec<Transversal>> = vec![vec![]; latin.size() as usize];
 
     for perm in (0..latin.size()).permutations(latin.size() as usize) {
         // check whether this permutation is transversal
@@ -109,11 +108,7 @@ fn get_transversals(latin: &Latin) -> HashMap<u8, Vec<Transversal>> {
         if ok {
             let key = perm[0];
             let perm = Transversal::from_vec(perm);
-            if ret.contains_key(&key) {
-                ret.get_mut(&key).unwrap().push(perm);
-            } else {
-                ret.insert(key, vec![perm]);
-            }
+            ret[key as usize].push(perm);
         }
     }
 
@@ -142,15 +137,15 @@ fn pretty_print_latin(latin: &Latin) {
     }
 }
 fn dfs(
-    transversal_map: &HashMap<u8, Vec<Transversal>>,
-    state: Vec<Transversal>,
+    transversal_map: &Vec<Vec<Transversal>>,
+    state: &mut Vec<Transversal>,
     size: u8,
     search: u8,
     answers: &mut Vec<Vec<Transversal>>,
 ) {
     debug_assert_eq!(state.len(), search as usize);
 
-    let transversals = transversal_map.get(&search).unwrap();
+    let transversals = &transversal_map[search as usize];
 
     let mut sum = [[0u8; 16]; 16];
     for t in state.iter() {
@@ -159,6 +154,7 @@ fn dfs(
             sum[j as usize][t.get(j) as usize] = 1;
         }
     }
+    let sum = sum;
 
     for t in transversals.iter() {
         // state に t を追加して矛盾が生じないかチェックする
@@ -170,13 +166,13 @@ fn dfs(
             }
         }
         if ok {
-            let mut next_state = state.clone();
-            next_state.push(*t);
+            state.push(*t);
             if search + 1 == size {
-                answers.push(next_state);
+                answers.push(state.clone());
             } else {
-                dfs(transversal_map, next_state, size, search + 1, answers);
+                dfs(transversal_map, state, size, search + 1, answers);
             }
+            state.pop();
         }
     }
 }
@@ -188,15 +184,18 @@ fn search_orthogonal_latin(latin: &Latin, verbose: bool) -> Vec<Latin> {
         let mut sum = 0;
         print!("Transversals: \n\t");
         for i in 0..latin.size() {
-            let transversals = transversal_map.get(&i).unwrap();
+            let transversals = &transversal_map[i as usize];
             sum += transversals.len();
             print!("{} ", transversals.len());
         }
         println!("\nTotal transversals: \n\t{}", sum);
     }
 
+    let mut state = vec![];
     let mut answers = vec![];
-    dfs(&transversal_map, vec![], latin.size(), 0, &mut answers);
+    state.reserve(100);
+    answers.reserve(100);
+    dfs(&transversal_map, &mut state, latin.size(), 0, &mut answers);
 
     let mut ret = vec![];
     for answer in answers.into_iter() {
@@ -293,7 +292,7 @@ mod tests {
         let ts = get_transversals(&latin);
         for i in 0..latin.size() {
             println!("#{}", i);
-            pretty_print_transversal(&latin, ts.get(&i).unwrap()[0]);
+            pretty_print_transversal(&latin, ts[i as usize][0]);
         }
         assert_eq!(3, ts.len());
     }
