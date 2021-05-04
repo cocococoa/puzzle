@@ -82,6 +82,31 @@ impl Latin {
     }
 }
 
+pub fn orthogonal(lhs: &Latin, rhs: &Latin) -> bool {
+    if lhs.size() != rhs.size() || !lhs.valid() || !rhs.valid() {
+        return false;
+    }
+
+    let size = lhs.size() as usize;
+    let mut hist = vec![vec![0u8; size]; size];
+    for i in 0..size {
+        for j in 0..size {
+            let x = lhs.get(i as u8, j as u8);
+            let y = rhs.get(i as u8, j as u8);
+            hist[x as usize][y as usize] += 1;
+        }
+    }
+    for i in 0..size {
+        for j in 0..size {
+            if hist[i][j] != 1 {
+                return false;
+            }
+        }
+    }
+
+    true
+}
+
 #[derive(Clone, Copy)]
 pub struct Transversal(u64);
 impl Transversal {
@@ -137,6 +162,7 @@ pub fn get_transversals(latin: &Latin) -> Vec<Vec<Transversal>> {
 
     ret
 }
+
 pub fn pretty_print_transversal(latin: &Latin, transversal: Transversal) {
     for i in 0..latin.size() {
         for j in 0..latin.size() {
@@ -149,6 +175,7 @@ pub fn pretty_print_transversal(latin: &Latin, transversal: Transversal) {
         print!("\n")
     }
 }
+
 pub fn pretty_print_latin(latin: &Latin) {
     for i in 0..latin.size() {
         print!("\t");
@@ -158,6 +185,7 @@ pub fn pretty_print_latin(latin: &Latin) {
         print!("\n")
     }
 }
+
 fn dfs(
     transversal_map: &Vec<Vec<Transversal>>,
     state: &mut Vec<Transversal>,
@@ -198,6 +226,7 @@ fn dfs(
         }
     }
 }
+
 pub fn search_orthogonal_latin(latin: &Latin, verbose: bool) -> Vec<Latin> {
     let start = Instant::now();
     let transversal_map = get_transversals(latin);
@@ -252,12 +281,19 @@ pub fn search_orthogonal_latin(latin: &Latin, verbose: bool) -> Vec<Latin> {
 
 pub fn solve(matrix: Vec<Vec<u8>>) {
     // Construct latin square
-    println!("Input latin square: ");
     let latin = Latin::from_vec(matrix);
+    if !latin.valid() {
+        println!("Invalid input");
+        panic!();
+    }
+    println!("Input latin square: ");
     pretty_print_latin(&latin);
 
     // Search orthogonal latin squares
     let orthogonals = search_orthogonal_latin(&latin, true);
+    for ortho in orthogonals.iter() {
+        assert!(orthogonal(&latin, ortho));
+    }
 
     // Show results
     println!(
