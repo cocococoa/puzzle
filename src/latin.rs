@@ -1,13 +1,15 @@
 use itertools::Itertools;
 use std::time::Instant;
 
+use crate::array::Array;
+
 // u64 = 4 bit * 16
 // 16x16までしか対応しない
 // 実行時間的に10x10が限界か？
 // mat は col-major
 pub struct Latin {
     size: u8,
-    mat: [u64; 16],
+    mat: [Array; 16],
 }
 impl Latin {
     pub fn new(size: u8) -> Self {
@@ -15,7 +17,7 @@ impl Latin {
 
         Latin {
             size: size,
-            mat: [0u64; 16],
+            mat: [Array::new(); 16],
         }
     }
     pub fn from_vec(vec: Vec<Vec<u8>>) -> Self {
@@ -34,24 +36,17 @@ impl Latin {
         self.size
     }
     pub fn set(&mut self, i: u8, j: u8, v: u8) {
-        assert!(i < self.size);
-        assert!(j < self.size);
-        assert!(v < self.size);
+        debug_assert!(i < self.size);
+        debug_assert!(j < self.size);
+        debug_assert!(v < self.size);
 
-        // set 0
-        let mask = 0xfu64 << (i << 2);
-        let mask = !mask;
-        self.mat[j as usize] &= mask;
-        // set v
-        let v = (v as u64) << (i << 2);
-        self.mat[j as usize] |= v;
+        self.mat[j as usize].set(i as usize, v)
     }
     pub fn get(&self, i: u8, j: u8) -> u8 {
-        assert!(i < self.size);
-        assert!(j < self.size);
+        debug_assert!(i < self.size);
+        debug_assert!(j < self.size);
 
-        let mask = 0xfu64;
-        ((self.mat[j as usize] >> (i << 2)) & mask) as u8
+        self.mat[j as usize].get(i as usize)
     }
     pub fn valid(&self) -> bool {
         for i in 0..self.size() {
