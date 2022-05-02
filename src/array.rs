@@ -1,12 +1,12 @@
 // 64 = 4 × 16
 // 4bit の数字を16個並べる配列
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Hash)]
-pub struct Array {
+pub struct Array64 {
     array: u64,
 }
-impl Array {
+impl Array64 {
     pub fn new() -> Self {
-        Array { array: 0 as u64 }
+        Array64 { array: 0 as u64 }
     }
     /// Set i-th element as v
     /// 
@@ -39,12 +39,12 @@ mod tests {
     #[test]
     fn test_compile_time_array() {
         use std::mem;
-        assert_eq!(8, mem::size_of::<Array>());
+        assert_eq!(8, mem::size_of::<Array64>());
     }
 
     #[test]
     fn test_array() {
-        let mut array = Array::new();
+        let mut array = Array64::new();
 
         assert_eq!(0, array.array);
         for i in 0..16 {

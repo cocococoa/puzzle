@@ -1,7 +1,7 @@
 use itertools::Itertools;
 use std::time::Instant;
 
-use crate::array::Array;
+use crate::array::Array64;
 
 // u64 = 4 bit * 16
 // 16x16までしか対応しない
@@ -9,7 +9,7 @@ use crate::array::Array;
 // mat は col-major
 pub struct Latin {
     size: u8,
-    mat: [Array; 16],
+    mat: [Array64; 16],
 }
 impl Latin {
     pub fn new(size: u8) -> Self {
@@ -17,7 +17,7 @@ impl Latin {
 
         Latin {
             size: size,
-            mat: [Array::new(); 16],
+            mat: [Array64::new(); 16],
         }
     }
     pub fn from_vec(vec: Vec<Vec<u8>>) -> Self {
