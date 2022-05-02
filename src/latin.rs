@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use std::time::Instant;
+// use std::time::Instant;
 
 use crate::array::Array64;
 
@@ -223,7 +223,7 @@ fn dfs(
 }
 
 pub fn search_orthogonal_latin(latin: &Latin, verbose: bool) -> Vec<Latin> {
-    let start = Instant::now();
+    // let start = Instant::now();
     let transversal_map = get_transversals(latin);
 
     if verbose {
@@ -262,14 +262,14 @@ pub fn search_orthogonal_latin(latin: &Latin, verbose: bool) -> Vec<Latin> {
         ret.push(x);
     }
 
-    let end = start.elapsed();
-    if verbose {
-        println!(
-            "Search time of orthogonal latin squares: \n\t{}.{:03} [sec]",
-            end.as_secs(),
-            end.subsec_nanos() / 1_000_000
-        );
-    }
+    // let end = start.elapsed();
+    // if verbose {
+    //     println!(
+    //         "Search time of orthogonal latin squares: \n\t{}.{:03} [sec]",
+    //         end.as_secs(),
+    //         end.subsec_nanos() / 1_000_000
+    //     );
+    // }
 
     ret
 }
