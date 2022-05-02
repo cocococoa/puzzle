@@ -1,5 +1,6 @@
 use itertools::Itertools;
 // use std::time::Instant;
+use std::fmt;
 
 use crate::array::Array64;
 
@@ -73,6 +74,7 @@ impl Latin {
                 }
             }
         }
+
         true
     }
 }
@@ -102,8 +104,21 @@ pub fn orthogonal(lhs: &Latin, rhs: &Latin) -> bool {
     true
 }
 
+impl fmt::Display for Latin {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for i in 0..self.size() {
+            for j in 0..self.size() {
+                write!(f, "{}", self.get(i, j))?;
+            }
+            write!(f, "\n")?;
+        }
+
+        Ok(())
+    }
+}
 #[derive(Clone, Copy)]
 pub struct Transversal(u64);
+
 impl Transversal {
     pub fn new() -> Self {
         Transversal(0)
