@@ -4,10 +4,22 @@ use std::fmt;
 
 use crate::array::Array64;
 
+use wasm_bindgen::prelude::*;
+extern crate web_sys;
+
+// A macro to provide `println!(..)`-style syntax for `console.log` logging.
+macro_rules! log {
+    ( $( $t:tt )* ) => {
+        web_sys::console::log_1(&format!( $( $t )* ).into());
+    }
+}
+
 // u64 = 4 bit * 16
 // 16x16までしか対応しない
 // 実行時間的に10x10が限界か？
 // mat は col-major
+#[wasm_bindgen]
+#[derive(Clone)]
 pub struct Latin {
     size: u8,
     mat: [Array64; 16],
@@ -32,22 +44,6 @@ impl Latin {
         }
 
         latin
-    }
-    pub fn size(&self) -> u8 {
-        self.size
-    }
-    pub fn set(&mut self, i: u8, j: u8, v: u8) {
-        debug_assert!(i < self.size);
-        debug_assert!(j < self.size);
-        debug_assert!(v < self.size);
-
-        self.mat[j as usize].set(i as usize, v)
-    }
-    pub fn get(&self, i: u8, j: u8) -> u8 {
-        debug_assert!(i < self.size);
-        debug_assert!(j < self.size);
-
-        self.mat[j as usize].get(i as usize)
     }
     pub fn valid(&self) -> bool {
         for i in 0..self.size() {
@@ -104,6 +100,43 @@ pub fn orthogonal(lhs: &Latin, rhs: &Latin) -> bool {
     true
 }
 
+#[wasm_bindgen]
+impl Latin {
+    pub fn mynew() -> Self {
+        Latin::from_vec(vec![
+            vec![4, 5, 6, 0, 1, 2, 3],
+            vec![5, 6, 0, 1, 2, 3, 4],
+            vec![6, 0, 1, 2, 3, 4, 5],
+            vec![0, 1, 2, 3, 4, 5, 6],
+            vec![1, 2, 3, 4, 5, 6, 0],
+            vec![2, 3, 4, 5, 6, 0, 1],
+            vec![3, 4, 5, 6, 0, 1, 2],
+        ])
+    }
+    pub fn orthogonal(&self) -> Latin {
+        search_orthogonal_latin(self, false).pop().unwrap()
+    }
+    pub fn size(&self) -> u8 {
+        self.size
+    }
+    pub fn set(&mut self, i: u8, j: u8, v: u8) {
+        debug_assert!(i < self.size);
+        debug_assert!(j < self.size);
+        debug_assert!(v < self.size);
+
+        self.mat[j as usize].set(i as usize, v)
+    }
+    pub fn get(&self, i: u8, j: u8) -> u8 {
+        debug_assert!(i < self.size);
+        debug_assert!(j < self.size);
+
+        self.mat[j as usize].get(i as usize)
+    }
+    pub fn render(&self) -> String {
+        self.to_string()
+    }
+}
+
 impl fmt::Display for Latin {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for i in 0..self.size() {
@@ -116,6 +149,8 @@ impl fmt::Display for Latin {
         Ok(())
     }
 }
+
+#[wasm_bindgen]
 #[derive(Clone, Copy)]
 pub struct Transversal(u64);
 

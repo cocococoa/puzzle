@@ -1,5 +1,8 @@
+use wasm_bindgen::prelude::*;
+
 // 64 = 4 × 16
 // 4bit の数字を16個並べる配列
+#[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Hash)]
 pub struct Array64 {
     array: u64,

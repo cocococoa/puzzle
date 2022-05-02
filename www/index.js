@@ -1,3 +1,14 @@
-import * as wasm from "hello-wasm-pack";
+import { Latin } from "puzzle";
 
-wasm.greet();
+const pre = document.getElementById("puzzle-canvas");
+const latin = Latin.mynew();
+const ortho = latin.orthogonal();
+
+const renderLoop = () => {
+    // pre.textContent = latin.render();
+    pre.textContent = ortho.render();
+
+    requestAnimationFrame(renderLoop);
+};
+
+requestAnimationFrame(renderLoop);
