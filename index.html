@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Hello wasm-pack!</title>
+</head>
+
+<body>
+  <h2>直交ラテン方陣</h2>
+  ラテン方陣
+  <br>
+  <canvas id="latin-canvas"></canvas>
+  <br>
+  横断 <input type="number" id="trans-idx" value="0">(横断数: <span id="number-of-trans"></span>)
+  <br>
+  <canvas id="trans-canvas"></canvas>
+  <br>
+  直交ラテン方陣 <input type="number" id="ortho-idx" value="0">(横断数: <span id="number-of-ortho"></span>)
+  <br>
+  <canvas id="ortho-canvas"></canvas>
+
+  <script src="./bootstrap.js"></script>
+  <script type="module">
+    import init, * as module from './js/puzzle.js';
+    init();
+  </script>
+</body>
+
+</html>
