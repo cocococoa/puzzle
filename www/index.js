@@ -1,12 +1,13 @@
 import { Latin } from "puzzle";
 
-const pre = document.getElementById("puzzle-canvas");
+const latin_canvas = document.getElementById("latin-canvas");
+const ortho_canvas = document.getElementById("ortho-canvas");
 const latin = Latin.mynew();
 const ortho = latin.orthogonal();
 
 const renderLoop = () => {
-    // pre.textContent = latin.render();
-    pre.textContent = ortho.render();
+    latin_canvas.textContent = latin.render();
+    ortho_canvas.textContent = ortho.render();
 
     requestAnimationFrame(renderLoop);
 };
