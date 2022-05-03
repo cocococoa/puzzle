@@ -1,23 +1,37 @@
 use itertools::Itertools;
-use std::time::Instant;
+// use std::time::Instant;
+use std::fmt;
 
-use crate::array::Array;
+use crate::array::Array64;
+
+use wasm_bindgen::prelude::*;
+extern crate web_sys;
+
+// A macro to provide `println!(..)`-style syntax for `console.log` logging.
+// macro_rules! log {
+//     ( $( $t:tt )* ) => {
+//         web_sys::console::log_1(&format!( $( $t )* ).into());
+//     }
+// }
 
 // u64 = 4 bit * 16
 // 16x16までしか対応しない
 // 実行時間的に10x10が限界か？
 // mat は col-major
+#[wasm_bindgen]
+#[derive(Clone)]
 pub struct Latin {
     size: u8,
-    mat: [Array; 16],
+    mat: [Array64; 16],
 }
+
 impl Latin {
     pub fn new(size: u8) -> Self {
         assert!(size < 16);
 
         Latin {
             size: size,
-            mat: [Array::new(); 16],
+            mat: [Array64::new(); 16],
         }
     }
     pub fn from_vec(vec: Vec<Vec<u8>>) -> Self {
@@ -31,22 +45,6 @@ impl Latin {
         }
 
         latin
-    }
-    pub fn size(&self) -> u8 {
-        self.size
-    }
-    pub fn set(&mut self, i: u8, j: u8, v: u8) {
-        debug_assert!(i < self.size);
-        debug_assert!(j < self.size);
-        debug_assert!(v < self.size);
-
-        self.mat[j as usize].set(i as usize, v)
-    }
-    pub fn get(&self, i: u8, j: u8) -> u8 {
-        debug_assert!(i < self.size);
-        debug_assert!(j < self.size);
-
-        self.mat[j as usize].get(i as usize)
     }
     pub fn valid(&self) -> bool {
         for i in 0..self.size() {
@@ -73,6 +71,7 @@ impl Latin {
                 }
             }
         }
+
         true
     }
 }
@@ -102,8 +101,83 @@ pub fn orthogonal(lhs: &Latin, rhs: &Latin) -> bool {
     true
 }
 
+#[wasm_bindgen]
+impl Latin {
+    pub fn mynew() -> Self {
+        Latin::from_vec(vec![
+            vec![4, 5, 6, 0, 1, 2, 3],
+            vec![5, 6, 0, 1, 2, 3, 4],
+            vec![6, 0, 1, 2, 3, 4, 5],
+            vec![0, 1, 2, 3, 4, 5, 6],
+            vec![1, 2, 3, 4, 5, 6, 0],
+            vec![2, 3, 4, 5, 6, 0, 1],
+            vec![3, 4, 5, 6, 0, 1, 2],
+        ])
+    }
+    pub fn transversal(&self) -> TransversalList {
+        TransversalList {
+            transversal_list: get_transversals(self).into_iter().flatten().collect(),
+        }
+    }
+    pub fn orthogonal(&self) -> LatinList {
+        LatinList {
+            latin_list: search_orthogonal_latin(self, false),
+        }
+    }
+    pub fn size(&self) -> u8 {
+        self.size
+    }
+    pub fn set(&mut self, i: u8, j: u8, v: u8) {
+        debug_assert!(i < self.size);
+        debug_assert!(j < self.size);
+        debug_assert!(v < self.size);
+
+        self.mat[j as usize].set(i as usize, v)
+    }
+    pub fn get(&self, i: u8, j: u8) -> u8 {
+        debug_assert!(i < self.size);
+        debug_assert!(j < self.size);
+
+        self.mat[j as usize].get(i as usize)
+    }
+    pub fn render(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl fmt::Display for Latin {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for i in 0..self.size() {
+            for j in 0..self.size() {
+                write!(f, "{}", self.get(i, j))?;
+            }
+            write!(f, "\n")?;
+        }
+
+        Ok(())
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Clone)]
+pub struct LatinList {
+    latin_list: Vec<Latin>,
+}
+
+#[wasm_bindgen]
+impl LatinList {
+    pub fn size(&self) -> usize {
+        self.latin_list.len()
+    }
+    pub fn get(&self, idx: usize) -> Latin {
+        self.latin_list[idx].clone()
+    }
+}
+
+#[wasm_bindgen]
 #[derive(Clone, Copy)]
 pub struct Transversal(u64);
+
 impl Transversal {
     pub fn new() -> Self {
         Transversal(0)
@@ -116,6 +190,10 @@ impl Transversal {
         }
         Transversal(t)
     }
+}
+
+#[wasm_bindgen]
+impl Transversal {
     pub fn set(&mut self, j: u8, v: u8) {
         // set 0
         let mask = 0xfu64 << (j << 2);
@@ -128,6 +206,22 @@ impl Transversal {
     pub fn get(&self, j: u8) -> u8 {
         let mask = 0xfu64;
         ((self.0 >> (j << 2)) & mask) as u8
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Clone)]
+pub struct TransversalList {
+    transversal_list: Vec<Transversal>,
+}
+
+#[wasm_bindgen]
+impl TransversalList {
+    pub fn size(&self) -> usize {
+        self.transversal_list.len()
+    }
+    pub fn get(&self, idx: usize) -> Transversal {
+        self.transversal_list[idx]
     }
 }
 
@@ -223,7 +317,7 @@ fn dfs(
 }
 
 pub fn search_orthogonal_latin(latin: &Latin, verbose: bool) -> Vec<Latin> {
-    let start = Instant::now();
+    // let start = Instant::now();
     let transversal_map = get_transversals(latin);
 
     if verbose {
@@ -262,14 +356,14 @@ pub fn search_orthogonal_latin(latin: &Latin, verbose: bool) -> Vec<Latin> {
         ret.push(x);
     }
 
-    let end = start.elapsed();
-    if verbose {
-        println!(
-            "Search time of orthogonal latin squares: \n\t{}.{:03} [sec]",
-            end.as_secs(),
-            end.subsec_nanos() / 1_000_000
-        );
-    }
+    // let end = start.elapsed();
+    // if verbose {
+    //     println!(
+    //         "Search time of orthogonal latin squares: \n\t{}.{:03} [sec]",
+    //         end.as_secs(),
+    //         end.subsec_nanos() / 1_000_000
+    //     );
+    // }
 
     ret
 }
