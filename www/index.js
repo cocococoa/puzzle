@@ -12,6 +12,7 @@ const latin_canvas = document.getElementById("latin-canvas");
 const trans_canvas = document.getElementById("trans-canvas");
 const ortho_canvas = document.getElementById("ortho-canvas");
 const trans_num_span = document.getElementById("number-of-transversals");
+const trans_input = document.getElementById("transversal-idx");
 const latin_ctx = latin_canvas.getContext("2d");
 const trans_ctx = trans_canvas.getContext("2d");
 const ortho_ctx = ortho_canvas.getContext("2d");
@@ -23,15 +24,33 @@ ortho_canvas.height = (CELL_SIZE + 1) * size + 1;
 ortho_canvas.width = (CELL_SIZE + 1) * size + 1;
 
 const renderLoop = () => {
+    const num_transversals = transversal_list.size();
+    trans_num_span.textContent = num_transversals.toString();
+    const transversal_idx = clamp(trans_input.value, 0, num_transversals - 1);
+
+    initializeCanvas(latin_ctx);
     drawGrid(latin_ctx, latin.size());
     drawLatinCells(latin_ctx, latin);
-    trans_num_span.textContent = transversal_list.size().toString();
+
+    initializeCanvas(trans_ctx);
     drawGrid(trans_ctx, latin.size());
-    drawTransCells(trans_ctx, latin, transversal_list.get(30));
+    drawTransCells(trans_ctx, latin, transversal_list.get(transversal_idx));
+
+    initializeCanvas(ortho_ctx);
     drawGrid(ortho_ctx, ortho.size());
     drawLatinCells(ortho_ctx, ortho);
 
     requestAnimationFrame(renderLoop);
+};
+
+const clamp = (x, min, max) => {
+    if (x < min) return min;
+    if (x > max) return max;
+    return x;
+};
+
+const initializeCanvas = (ctx) => {
+    ctx.clearRect(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight);
 };
 
 const drawGrid = (ctx, size) => {
