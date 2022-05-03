@@ -20,7 +20,7 @@ jobs:
       - name: Build
         run: wasm-pack build --target web --out-dir public/js
       - name: Remove .gitignore added from wasm-pack
-        run: rm public/.gitignore
+        run: rm public/js/.gitignore
       - name: Publish
         uses: peaceiris/actions-gh-pages@v3
         with:
