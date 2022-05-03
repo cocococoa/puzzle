@@ -24,6 +24,7 @@ pub struct Latin {
     size: u8,
     mat: [Array64; 16],
 }
+
 impl Latin {
     pub fn new(size: u8) -> Self {
         assert!(size < 16);
@@ -113,6 +114,11 @@ impl Latin {
             vec![3, 4, 5, 6, 0, 1, 2],
         ])
     }
+    pub fn transversal(&self) -> TransversalList {
+        TransversalList {
+            transversal_list: get_transversals(self).into_iter().flatten().collect(),
+        }
+    }
     pub fn orthogonal(&self) -> Latin {
         search_orthogonal_latin(self, false).pop().unwrap()
     }
@@ -166,6 +172,10 @@ impl Transversal {
         }
         Transversal(t)
     }
+}
+
+#[wasm_bindgen]
+impl Transversal {
     pub fn set(&mut self, j: u8, v: u8) {
         // set 0
         let mask = 0xfu64 << (j << 2);
@@ -178,6 +188,22 @@ impl Transversal {
     pub fn get(&self, j: u8) -> u8 {
         let mask = 0xfu64;
         ((self.0 >> (j << 2)) & mask) as u8
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Clone)]
+pub struct TransversalList {
+    transversal_list: Vec<Transversal>,
+}
+
+#[wasm_bindgen]
+impl TransversalList {
+    pub fn size(&self) -> usize {
+        self.transversal_list.len()
+    }
+    pub fn get(&self, idx: usize) -> Transversal {
+        self.transversal_list[idx]
     }
 }
 

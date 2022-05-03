@@ -2,19 +2,6 @@
 <html>
 
 <head>
-  <style>
-    body {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-  </style>
   <meta charset="utf-8">
   <title>Hello wasm-pack!</title>
 </head>
@@ -22,10 +9,12 @@
 <body>
   <h2>直交ラテン方陣</h2>
   ラテン方陣
-  <canvas id="latin-canvas"></canvas>
-  Transversals
   <br>
-  TODO: 画像
+  <canvas id="latin-canvas"></canvas>
+  <br>
+  横断 (横断数: <span id="number-of-transversals"></span>)
+  <br>
+  <canvas id="trans-canvas"></canvas>
   <br>
   直交ラテン方陣
   <br>
