@@ -1,10 +1,8 @@
-import { Latin } from "puzzle";
-
 const CELL_SIZE = 50; // px
 const FONT_SIZE = 40; // px
 const GRID_COLOR = "#CCCCCC";
 
-const latin = Latin.mynew();
+const latin = module.Latin.mynew();
 const size = latin.size();
 const ortho_list = latin.orthogonal();
 const trans_list = latin.transversal();
