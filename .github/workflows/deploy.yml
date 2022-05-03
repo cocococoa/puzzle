@@ -18,7 +18,7 @@ jobs:
       - name: Copy www to public
         run: cp -r www public
       - name: Build
-        run: wasm-pack build --target web --out-dir public
+        run: wasm-pack build --target web --out-dir public/js
       - name: Remove .gitignore added from wasm-pack
         run: rm public/.gitignore
       - name: Publish
