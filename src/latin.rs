@@ -119,8 +119,10 @@ impl Latin {
             transversal_list: get_transversals(self).into_iter().flatten().collect(),
         }
     }
-    pub fn orthogonal(&self) -> Latin {
-        search_orthogonal_latin(self, false).pop().unwrap()
+    pub fn orthogonal(&self) -> LatinList {
+        LatinList {
+            latin_list: search_orthogonal_latin(self, false),
+        }
     }
     pub fn size(&self) -> u8 {
         self.size
@@ -153,6 +155,22 @@ impl fmt::Display for Latin {
         }
 
         Ok(())
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Clone)]
+pub struct LatinList {
+    latin_list: Vec<Latin>,
+}
+
+#[wasm_bindgen]
+impl LatinList {
+    pub fn size(&self) -> usize {
+        self.latin_list.len()
+    }
+    pub fn get(&self, idx: usize) -> Latin {
+        self.latin_list[idx].clone()
     }
 }
 

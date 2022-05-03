@@ -5,14 +5,20 @@ const FONT_SIZE = 40; // px
 const GRID_COLOR = "#CCCCCC";
 
 const latin = Latin.mynew();
-const ortho = latin.orthogonal();
-const transversal_list = latin.transversal();
 const size = latin.size();
+const ortho_list = latin.orthogonal();
+const trans_list = latin.transversal();
+
+// input
+const trans_input = document.getElementById("trans-idx");
+const ortho_input = document.getElementById("ortho-idx");
+
+// output
+const trans_num_span = document.getElementById("number-of-trans");
+const ortho_num_span = document.getElementById("number-of-ortho");
 const latin_canvas = document.getElementById("latin-canvas");
 const trans_canvas = document.getElementById("trans-canvas");
 const ortho_canvas = document.getElementById("ortho-canvas");
-const trans_num_span = document.getElementById("number-of-transversals");
-const trans_input = document.getElementById("transversal-idx");
 const latin_ctx = latin_canvas.getContext("2d");
 const trans_ctx = trans_canvas.getContext("2d");
 const ortho_ctx = ortho_canvas.getContext("2d");
@@ -24,9 +30,12 @@ ortho_canvas.height = (CELL_SIZE + 1) * size + 1;
 ortho_canvas.width = (CELL_SIZE + 1) * size + 1;
 
 const renderLoop = () => {
-    const num_transversals = transversal_list.size();
-    trans_num_span.textContent = num_transversals.toString();
-    const transversal_idx = clamp(trans_input.value, 0, num_transversals - 1);
+    const num_trans = trans_list.size();
+    trans_num_span.textContent = num_trans.toString();
+    const trans_idx = clamp(trans_input.value, 0, num_trans - 1);
+    const num_ortho = ortho_list.size();
+    ortho_num_span.textContent = num_ortho.toString();
+    const ortho_idx = clamp(ortho_input.value, 0, num_ortho - 1);
 
     initializeCanvas(latin_ctx);
     drawGrid(latin_ctx, latin.size());
@@ -34,11 +43,11 @@ const renderLoop = () => {
 
     initializeCanvas(trans_ctx);
     drawGrid(trans_ctx, latin.size());
-    drawTransCells(trans_ctx, latin, transversal_list.get(transversal_idx));
+    drawTransCells(trans_ctx, latin, trans_list.get(trans_idx));
 
     initializeCanvas(ortho_ctx);
-    drawGrid(ortho_ctx, ortho.size());
-    drawLatinCells(ortho_ctx, ortho);
+    drawGrid(ortho_ctx, latin.size());
+    drawLatinCells(ortho_ctx, ortho_list.get(ortho_idx));
 
     requestAnimationFrame(renderLoop);
 };
